@@ -22,5 +22,5 @@ app.use((req, res, next) => {
 app.use(router);
 
 app.listen(PORT, () => {
-  console.log('Слушаю nightcall на порту 3000');
+  console.log('Сервер запущен на порту 3000');
 });
