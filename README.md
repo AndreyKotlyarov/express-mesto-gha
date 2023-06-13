@@ -8,9 +8,9 @@
 `/controllers` — папка с файлами контроллеров пользователя и карточки  
 `/models` — папка с файлами описания схем пользователя и карточки
 
-Остальные директории вспомогательные, создаются при необходимости разработчиком
-
 ## Запуск проекта
 
 `npm run start` — запускает сервер  
 `npm run dev` — запускает сервер с hot-reload
+
+Cсылка на репозиторий GitHub: [https://github.com/AndreyKotlyarov/express-mesto-gha/](https://github.com/AndreyKotlyarov/express-mesto-gha)
