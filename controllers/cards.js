@@ -25,7 +25,7 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   cardModel
     .findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => res.status(500).send({ message: `${err.name}` }));
 };
 const setLike = (req, res) => {
@@ -35,8 +35,8 @@ const setLike = (req, res) => {
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     )
-    .then((card) => res.send(card))
-    .catch((err) => res.status(500).send({ message: `${err.name}` }));
+    .then((card) => res.status(200).send(card))
+    .catch((err) => res.status(400).send({ message: `${err.name}` }));
 };
 const deleteLike = (req, res) => {
   cardModel
@@ -45,8 +45,8 @@ const deleteLike = (req, res) => {
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
     )
-    .then((card) => res.send(card))
-    .catch((err) => res.status(500).send({ message: `${err.name}` }));
+    .then((card) => res.status(200).send(card))
+    .catch((err) => res.status(400).send({ message: `${err.name}` }));
 };
 
 module.exports = {
