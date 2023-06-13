@@ -14,7 +14,7 @@ const getUserById = (req, res) => {
   userModel
     .findById(req.params.userId)
     .then((user) => res.send(user))
-    .catch((err) => res.status(404).send({
+    .catch((err) => res.status(400).send({
       message: 'Пользователь не найден',
       err: err.message,
       stack: err.stack,
@@ -24,9 +24,9 @@ const createUser = (req, res) => {
   userModel
     .create(req.body)
     .then((user) => {
-      res.status(201).send(user);
+      res.status(200).send(user);
     })
-    .catch((err) => res.status(404).send({
+    .catch((err) => res.status(400).send({
       message: 'Ошибка валидации',
       err: err.message,
       stack: err.stack,
@@ -59,7 +59,7 @@ const updateAvatar = (req, res) => {
       { new: true, runValidators: true },
     )
     .then((user) => {
-      res.status(201).send(user);
+      res.status(200).send(user);
     })
     .catch((err) => res.status(400).send({
       message: 'Ошибка валидации',

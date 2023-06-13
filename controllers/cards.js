@@ -14,9 +14,9 @@ const createCard = (req, res) => {
   cardModel
     .create(req.body)
     .then((card) => {
-      res.status(201).send(card);
+      res.status(200).send(card);
     })
-    .catch((err) => res.status(404).send({
+    .catch((err) => res.status(400).send({
       message: 'Ошибка валидации',
       err: err.message,
       stack: err.stack,
