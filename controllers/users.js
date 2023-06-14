@@ -12,6 +12,7 @@ const getUsers = (req, res) => {
 const getUserById = (req, res) => {
   userModel
     .findById(req.params.userId)
+    .orFail(() => { throw new Error(); })
     .then((user) => res.send(user))
     .catch(() => res.status(400).send({
       message: 'Пользователь не найден',
