@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const cardModel = require('../models/card');
 
 const getCards = (req, res) => {
@@ -5,9 +6,7 @@ const getCards = (req, res) => {
     .find({})
     .then((cards) => res.send(cards))
     .catch((err) => res.status(500).send({
-      message: 'Произошла ошибка',
-      err: err.message,
-      stack: err.stack,
+      message: `'Произошла ошибка на сервере: ${err.message}'`,
     }));
 };
 const createCard = (req, res) => {
@@ -16,17 +15,21 @@ const createCard = (req, res) => {
     .then((card) => {
       res.status(200).send(card);
     })
-    .catch((err) => res.status(400).send({
-      message: 'Ошибка валидации',
-      err: err.message,
-      stack: err.stack,
-    }));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Ошибка валидации' });
+        return;
+      }
+      res.status(500).send({
+        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      });
+    });
 };
 const deleteCard = (req, res) => {
   cardModel
     .findByIdAndRemove(req.params.cardId)
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(500).send({ message: `${err.name}` }));
+    .catch((err) => res.status(400).send({ message: `${err.name}` }));
 };
 const setLike = (req, res) => {
   cardModel

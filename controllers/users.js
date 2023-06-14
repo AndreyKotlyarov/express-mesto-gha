@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const userModel = require('../models/user');
 
 const getUsers = (req, res) => {
@@ -5,19 +6,15 @@ const getUsers = (req, res) => {
     .find({})
     .then((users) => res.send(users))
     .catch((err) => res.status(500).send({
-      message: 'Произошла ошибка',
-      err: err.message,
-      stack: err.stack,
+      message: `'Произошла ошибка на сервере: ${err.message}'`,
     }));
 };
 const getUserById = (req, res) => {
   userModel
     .findById(req.params.userId)
     .then((user) => res.send(user))
-    .catch((err) => res.status(400).send({
+    .catch(() => res.status(400).send({
       message: 'Пользователь не найден',
-      err: err.message,
-      stack: err.stack,
     }));
 };
 const createUser = (req, res) => {
@@ -26,11 +23,15 @@ const createUser = (req, res) => {
     .then((user) => {
       res.status(200).send(user);
     })
-    .catch((err) => res.status(400).send({
-      message: 'Ошибка валидации',
-      err: err.message,
-      stack: err.stack,
-    }));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Ошибка валидации' });
+        return;
+      }
+      res.status(500).send({
+        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      });
+    });
 };
 const updateUser = (req, res) => {
   userModel
@@ -43,13 +44,17 @@ const updateUser = (req, res) => {
       { new: true, runValidators: true },
     )
     .then((user) => {
-      res.status(201).send(user);
+      res.status(200).send(user);
     })
-    .catch((err) => res.status(400).send({
-      message: 'Ошибка валидации',
-      err: err.message,
-      stack: err.stack,
-    }));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Ошибка валидации' });
+        return;
+      }
+      res.status(500).send({
+        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      });
+    });
 };
 const updateAvatar = (req, res) => {
   userModel
@@ -61,11 +66,15 @@ const updateAvatar = (req, res) => {
     .then((user) => {
       res.status(200).send(user);
     })
-    .catch((err) => res.status(400).send({
-      message: 'Ошибка валидации',
-      err: err.message,
-      stack: err.stack,
-    }));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Ошибка валидации' });
+        return;
+      }
+      res.status(500).send({
+        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      });
+    });
 };
 
 module.exports = {
