@@ -29,8 +29,9 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   cardModel
     .findByIdAndRemove(req.params.cardId)
+    .orFail(() => { throw new Error(); })
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(400).send({ message: `${err.name}` }));
+    .catch((err) => res.status(404).send({ message: `${err.name}` }));
 };
 const setLike = (req, res) => {
   cardModel
@@ -41,7 +42,13 @@ const setLike = (req, res) => {
     )
     .orFail(() => { throw new Error(); })
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(400).send({ message: `${err.name}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `${err.name}` });
+      } else {
+        res.status(404).send({ message: `${err.name}` });
+      }
+    });
 };
 const deleteLike = (req, res) => {
   cardModel
@@ -52,7 +59,13 @@ const deleteLike = (req, res) => {
     )
     .orFail(() => { throw new Error(); })
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(400).send({ message: `${err.name}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `${err.name}` });
+      } else {
+        res.status(404).send({ message: `${err.name}` });
+      }
+    });
 };
 
 module.exports = {
