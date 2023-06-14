@@ -38,7 +38,7 @@ const setLike = (req, res) => {
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     )
-    .orFail(() => {throw new Error()})
+    .orFail(() => { throw new Error(); })
     .then((card) => res.status(200).send(card))
     .catch((err) => res.status(400).send({ message: `${err.name}` }));
 };
@@ -49,7 +49,7 @@ const deleteLike = (req, res) => {
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
     )
-    .orFail(() => {throw new Error()})
+    .orFail(() => { throw new Error(); })
     .then((card) => res.status(200).send(card))
     .catch((err) => res.status(400).send({ message: `${err.name}` }));
 };
