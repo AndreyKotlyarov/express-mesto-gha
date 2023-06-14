@@ -21,9 +21,9 @@ const getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'Not found') {
-        res.status(badRequest).send({ message: 'Ошибка валидации' });
-      } else {
         res.status(notFound).send({ message: 'Пользователь не найден' });
+      } else {
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
       }
     });
 };
