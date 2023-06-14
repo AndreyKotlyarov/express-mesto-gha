@@ -31,7 +31,13 @@ const deleteCard = (req, res) => {
     .findByIdAndRemove(req.params.cardId)
     .orFail(() => { throw new Error(); })
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(404).send({ message: `${err.name}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `${err.name}` });
+      } else {
+        res.status(404).send({ message: `${err.name}` });
+      }
+    });
 };
 const setLike = (req, res) => {
   cardModel
