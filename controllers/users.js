@@ -22,8 +22,10 @@ const getUserById = (req, res) => {
     .catch((err) => {
       if (err.message === 'Not found') {
         res.status(notFound).send({ message: 'Пользователь не найден' });
-      } else {
+      } else if (err.name === 'CastError') {
         res.status(badRequest).send({ message: 'Ошибка валидации' });
+      } else {
+        res.status(internalServerError).send({ message: 'Произошла ошибка на сервере' });
       }
     });
 };
@@ -31,7 +33,7 @@ const createUser = (req, res) => {
   userModel
     .create(req.body)
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
@@ -54,7 +56,7 @@ const updateUser = (req, res) => {
       { new: true, runValidators: true },
     )
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
@@ -74,7 +76,7 @@ const updateAvatar = (req, res) => {
       { new: true, runValidators: true },
     )
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
