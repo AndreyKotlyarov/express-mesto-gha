@@ -1,12 +1,17 @@
 const mongoose = require('mongoose');
 const cardModel = require('../models/card');
+const {
+  badRequest,
+  notFound,
+  internalServerError,
+} = require('../errors/errorStatuses');
 
 const getCards = (req, res) => {
   cardModel
     .find({})
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({
-      message: `'Произошла ошибка на сервере: ${err.message}'`,
+    .catch(() => res.status(internalServerError).send({
+      message: 'Произошла ошибка на сервере',
     }));
 };
 const createCard = (req, res) => {
@@ -18,24 +23,24 @@ const createCard = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Ошибка валидации' });
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
         return;
       }
-      res.status(500).send({
-        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      res.status(internalServerError).send({
+        message: 'Произошла ошибка на сервере',
       });
     });
 };
 const deleteCard = (req, res) => {
   cardModel
     .findByIdAndRemove(req.params.cardId)
-    .orFail(() => { throw new Error(); })
+    .orFail(() => { throw new Error('Not found'); })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: `${err.name}` });
+      if (err.message === 'Not found') {
+        res.status(notFound).send({ message: 'Карточка с указанным id не найдена' });
       } else {
-        res.status(404).send({ message: `${err.name}` });
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
       }
     });
 };
@@ -46,13 +51,13 @@ const setLike = (req, res) => {
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     )
-    .orFail(() => { throw new Error(); })
+    .orFail(() => { throw new Error('Not found'); })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: `${err.name}` });
+      if (err.message === 'Not found') {
+        res.status(notFound).send({ message: 'Карточка с указанным id не найдена' });
       } else {
-        res.status(404).send({ message: `${err.name}` });
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
       }
     });
 };
@@ -63,13 +68,13 @@ const deleteLike = (req, res) => {
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
     )
-    .orFail(() => { throw new Error(); })
+    .orFail(() => { throw new Error('Not found'); })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: `${err.name}` });
+      if (err.message === 'Not found') {
+        res.status(notFound).send({ message: 'Карточка с указанным id не найдена' });
       } else {
-        res.status(404).send({ message: `${err.name}` });
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
       }
     });
 };

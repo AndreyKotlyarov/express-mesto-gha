@@ -1,24 +1,29 @@
 const mongoose = require('mongoose');
 const userModel = require('../models/user');
+const {
+  badRequest,
+  notFound,
+  internalServerError,
+} = require('../errors/errorStatuses');
 
 const getUsers = (req, res) => {
   userModel
     .find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({
-      message: `'Произошла ошибка на сервере: ${err.message}'`,
+    .catch(() => res.status(internalServerError).send({
+      message: 'Произошла ошибка на сервере',
     }));
 };
 const getUserById = (req, res) => {
   userModel
     .findById(req.params.userId)
-    .orFail(() => { throw new Error(); })
+    .orFail(() => { throw new Error('Not found'); })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь не найден' });
+      if (err.message === 'Not found') {
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
       } else {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(notFound).send({ message: 'Пользователь не найден' });
       }
     });
 };
@@ -30,11 +35,11 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Ошибка валидации' });
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
         return;
       }
-      res.status(500).send({
-        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      res.status(internalServerError).send({
+        message: 'Произошла ошибка на сервере',
       });
     });
 };
@@ -53,11 +58,11 @@ const updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Ошибка валидации' });
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
         return;
       }
-      res.status(500).send({
-        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      res.status(internalServerError).send({
+        message: 'Произошла ошибка на сервере',
       });
     });
 };
@@ -73,11 +78,11 @@ const updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Ошибка валидации' });
+        res.status(badRequest).send({ message: 'Ошибка валидации' });
         return;
       }
-      res.status(500).send({
-        message: `'Произошла ошибка на сервере: ${err.message}'`,
+      res.status(internalServerError).send({
+        message: 'Произошла ошибка на сервере',
       });
     });
 };
