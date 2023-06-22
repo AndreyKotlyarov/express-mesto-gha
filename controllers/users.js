@@ -1,35 +1,28 @@
 const mongoose = require('mongoose');
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
 const userModel = require('../models/user');
-const {
-  badRequest,
-  notFound,
-  internalServerError,
-} = require('../errors/errorStatuses');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   userModel
     .find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(internalServerError).send({
-      message: 'Произошла ошибка на сервере',
-    }));
+    .catch((err) => next(err));
 };
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   userModel
     .findById(req.params.userId)
-    .orFail(() => { throw new Error('Not found'); })
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.message === 'Not found') {
-        res.status(notFound).send({ message: 'Пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(badRequest).send({ message: 'Ошибка валидации' });
+      if (err.name === 'CastError') {
+        next(new ValidationError('Ошибка валидации'));
       } else {
-        res.status(internalServerError).send({ message: 'Произошла ошибка на сервере' });
+        next(err);
       }
     });
 };
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   userModel
     .create(req.body)
     .then((user) => {
@@ -37,15 +30,13 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(badRequest).send({ message: 'Ошибка валидации' });
-        return;
+        next(new ValidationError('Ошибка валидации'));
+      } else {
+        next(err);
       }
-      res.status(internalServerError).send({
-        message: 'Произошла ошибка на сервере',
-      });
     });
 };
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   userModel
     .findByIdAndUpdate(
       req.user._id,
@@ -60,15 +51,13 @@ const updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(badRequest).send({ message: 'Ошибка валидации' });
-        return;
+        next(new ValidationError('Ошибка валидации'));
+      } else {
+        next(err);
       }
-      res.status(internalServerError).send({
-        message: 'Произошла ошибка на сервере',
-      });
     });
 };
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   userModel
     .findByIdAndUpdate(
       req.user._id,
@@ -80,12 +69,10 @@ const updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(badRequest).send({ message: 'Ошибка валидации' });
-        return;
+        next(new ValidationError('Ошибка валидации'));
+      } else {
+        next(err);
       }
-      res.status(internalServerError).send({
-        message: 'Произошла ошибка на сервере',
-      });
     });
 };
 

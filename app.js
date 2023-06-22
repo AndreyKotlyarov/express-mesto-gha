@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const router = require('./routes');
+const { errorsHandler } = require('./errors/errorsHandler');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 
 app.use(router);
 
+app.use(errorsHandler);
 app.listen(PORT, () => {
   console.log('Сервер запущен на порту 3000');
 });
