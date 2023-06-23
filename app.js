@@ -17,6 +17,7 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(limiter);
+
 app.use(helmet());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', { useNewUrlParser: true })
@@ -27,17 +28,19 @@ mongoose.connect('mongodb://localhost:27017/mestodb', { useNewUrlParser: true })
   });
 
 app.use(express.json());
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64874bc412f5e78f3a143d7e', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
 
-  next();
-});
+// app.use((req, res, next) => {
+//   req.user = {
+//     _id: '64952baa4ab0f9b166f853fa',
+//   };
+
+//   next();
+// });
 
 app.use(router);
 
 app.use(errorsHandler);
+
 app.listen(PORT, () => {
   console.log('Сервер запущен на порту 3000');
 });

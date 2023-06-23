@@ -1,7 +1,37 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
+const ConflictError = require('../errors/ConflictError');
 const userModel = require('../models/user');
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  return userModel.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.cookie('token', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      })
+        .send({ token });
+    })
+    .catch((err) => next(err));
+};
+const getUserInfo = (req, res, next) => {
+  userModel
+    .findById(req.user._id)
+    .orFail(new NotFoundError('Пользователь не найден'))
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new ValidationError('Ошибка валидации'));
+      } else {
+        next(err);
+      }
+    });
+};
 
 const getUsers = (req, res, next) => {
   userModel
@@ -9,6 +39,7 @@ const getUsers = (req, res, next) => {
     .then((users) => res.send(users))
     .catch((err) => next(err));
 };
+
 const getUserById = (req, res, next) => {
   userModel
     .findById(req.params.userId)
@@ -23,17 +54,23 @@ const getUserById = (req, res, next) => {
     });
 };
 const createUser = (req, res, next) => {
-  userModel
-    .create(req.body)
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => userModel.create({
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar,
+      email: req.body.email,
+      password: hash,
+    }))
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с указанным email-ом уже существует'));
+      } else if (err instanceof mongoose.Error.ValidationError) {
         next(new ValidationError('Ошибка валидации'));
-      } else {
-        next(err);
-      }
+      } else { next(err); }
     });
 };
 const updateUser = (req, res, next) => {
@@ -77,6 +114,8 @@ const updateAvatar = (req, res, next) => {
 };
 
 module.exports = {
+  login,
+  getUserInfo,
   getUsers,
   getUserById,
   createUser,
