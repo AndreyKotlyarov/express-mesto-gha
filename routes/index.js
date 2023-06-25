@@ -11,8 +11,8 @@ const { validateCreateUser, validateLogin } = require('../middlewares/validate')
 router.post('/signin', validateLogin, login);
 router.post('/signup', validateCreateUser, createUser);
 
-router.use('/cards', auth, cardRouter);
 router.use('/users', auth, userRouter);
+router.use('/cards', auth, cardRouter);
 router.use((req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
 });

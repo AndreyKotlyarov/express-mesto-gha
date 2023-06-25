@@ -38,7 +38,7 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   userModel
-    .findById(req.params.userId)
+    .findById(req.params._id)
     .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => res.send(user))
     .catch((err) => {

@@ -7,13 +7,13 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 const {
-  validateGetUserById, validateGetUserInfo, validateUpdateUser, validateUpdateAvatar,
+  validateGetUserById, validateUpdateUser, validateUpdateAvatar,
 } = require('../middlewares/validate');
 
 router.get('/', getUsers);
-router.get('/:userId', validateGetUserById, getUserById);
-router.get('/me', validateGetUserInfo, getUserInfo);
+router.get('/:_id', validateGetUserById, getUserById);
 
+router.get('/me', getUserInfo);
 router.patch('/me', validateUpdateUser, updateUser);
 router.patch('/me/avatar', validateUpdateAvatar, updateAvatar);
 
