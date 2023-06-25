@@ -11,7 +11,7 @@ const login = (req, res, next) => {
   return userModel.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      res.send({ token });
+      res.send({ token }).select('-password');
     })
     .catch((err) => next(err));
 };
@@ -59,7 +59,13 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.send(user);
+      res.send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch((err) => {
       if (err.code === 11000) {
