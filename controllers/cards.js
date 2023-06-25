@@ -28,9 +28,15 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   cardModel
-    .findByIdAndRemove(req.params.cardId)
-    .orFail(new NotFoundError('Карточка с указанным id не найдена'))
-    .then((card) => res.send(card))
+    .findById(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        next(new NotFoundError('Карточка с указанным id не найдена'));
+      } else if (card.owner.toString() !== req.user._id) {
+        cardModel.findByIdAndRemove(req.params.cardId)
+          .then((c) => res.send(c));
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Ошибка валидации'));
