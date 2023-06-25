@@ -3,6 +3,7 @@ const cardModel = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
 const ForbiddenError = require('../errors/ForbiddenError');
+const created = require('../utils/consts');
 
 const getCards = (req, res, next) => {
   cardModel
@@ -16,7 +17,7 @@ const createCard = (req, res, next) => {
   cardModel
     .create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.send(card);
+      res.status(created).send(card);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {

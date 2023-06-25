@@ -5,6 +5,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
 const ConflictError = require('../errors/ConflictError');
 const userModel = require('../models/user');
+const created = require('../utils/consts');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -60,7 +61,7 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.send({
+      res.status(created).send({
         name: user.name,
         about: user.about,
         avatar: user.avatar,
