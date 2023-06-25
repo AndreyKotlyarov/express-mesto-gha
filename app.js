@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const router = require('./routes');
@@ -38,7 +39,7 @@ app.use(express.json());
 // });
 
 app.use(router);
-
+app.use(errors());
 app.use(errorsHandler);
 
 app.listen(PORT, () => {
