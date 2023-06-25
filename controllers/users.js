@@ -16,6 +16,7 @@ const login = (req, res, next) => {
     .catch((err) => next(err));
 };
 const getUserInfo = (req, res, next) => {
+  console.log(req.user._id);
   userModel
     .findById(req.user._id)
     .orFail(new NotFoundError('Пользователь не найден'))
