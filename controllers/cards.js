@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const cardModel = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 const getCards = (req, res, next) => {
   cardModel
@@ -33,6 +34,8 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         next(new NotFoundError('Карточка с указанным id не найдена'));
       } else if (card.owner.toString() !== req.user._id) {
+        next(new ForbiddenError('Недостаточно прав для удаления карточки'));
+      } else {
         cardModel.findByIdAndRemove(req.params.cardId)
           .then((c) => res.send(c));
       }
