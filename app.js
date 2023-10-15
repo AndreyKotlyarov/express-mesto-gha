@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const router = require('./routes');
 const { errorsHandler } = require('./errors/errorsHandler');
 
@@ -29,16 +30,9 @@ mongoose.connect('mongodb://localhost:27017/mestodb', { useNewUrlParser: true })
   });
 
 app.use(express.json());
-
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '64952baa4ab0f9b166f853fa',
-//   };
-
-//   next();
-// });
-
+app.use(requestLogger);
 app.use(router);
+app.use(errorLogger);
 app.use(errors());
 app.use(errorsHandler);
 
